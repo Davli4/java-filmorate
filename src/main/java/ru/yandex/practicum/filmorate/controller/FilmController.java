@@ -29,25 +29,25 @@ public class FilmController {
     public Film addFilm(@RequestBody Film film) {
         log.info("Add request, film: {}", film);
 
-        try{
+        try {
             log.info("Starting to validation films");
-            if(film.getName() == null || film.getName().isBlank()){
+            if (film.getName() == null || film.getName().isBlank()) {
                 String errorMessage = "Film name is mandatory";
                 log.error("Validation is not passed {}", errorMessage);
                 throw new ValidationException(errorMessage);
             }
-            if(film.getDescription().length() > 200){
+            if (film.getDescription().length() > 200) {
                 String errorMessage = "Film description is too long";
                 log.error("Validation is not passed {}", errorMessage);
                 throw new ValidationException(errorMessage);
             }
-            LocalDate cinemaDate = LocalDate.of(1895,12,28);
-            if(film.getReleaseDate().isBefore(cinemaDate)){
+            LocalDate cinemaDate = LocalDate.of(1895, 12, 28);
+            if (film.getReleaseDate().isBefore(cinemaDate)) {
                 String errorMessage = "Film release date is before cinema date";
                 log.error("Validation is not passed {}", errorMessage);
                 throw new ValidationException(errorMessage);
             }
-            if(film.getDuration() == null || film.getDuration().toMinutes() <= 0){
+            if (film.getDuration() == null || film.getDuration().toMinutes() <= 0) {
                 String errorMessage = "Film duration is negative";
                 log.error("Validation is not passed {}", errorMessage);
                 throw new ValidationException(errorMessage);
@@ -57,10 +57,10 @@ public class FilmController {
             films.put(film.getId(), film);
 
             return film;
-        } catch(ValidationException e) {
+        } catch (ValidationException e) {
             log.error("Error adding film: {}, case {}", film, e.getMessage());
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error("Unexpected error to adding film: {}", film, e);
             throw e;
         }
@@ -72,31 +72,31 @@ public class FilmController {
 
         try {
             log.info("Starting to validation films");
-            if(film.getId() == null){
+            if (film.getId() == null) {
                 String errorMessage = "Id should not be null";
                 log.error("Validation is not passed {}", errorMessage);
                 throw new ConditionsNotMetException(errorMessage);
             }
 
-            if(films.containsKey(film.getId())){
+            if (films.containsKey(film.getId())) {
                 Film oldFilm = films.get(film.getId());
-                if(film.getName() == null || film.getName().isBlank()){
+                if (film.getName() == null || film.getName().isBlank()) {
                     String errorMessage = "Film name is mandatory";
                     log.error("Validation is not passed {}", errorMessage);
                     throw new ValidationException(errorMessage);
                 }
-                if(film.getDescription().length() > 200){
+                if (film.getDescription().length() > 200) {
                     String errorMessage = "Film description is too long";
                     log.error("Validation is not passed {}", errorMessage);
                     throw new ValidationException(errorMessage);
                 }
-                LocalDate cinemaDate = LocalDate.of(1895,12,28);
-                if(film.getReleaseDate().isBefore(cinemaDate)){
+                LocalDate cinemaDate = LocalDate.of(1895, 12, 28);
+                if (film.getReleaseDate().isBefore(cinemaDate)) {
                     String errorMessage = "Film release date is before cinema date";
                     log.error("Validation is not passed {}", errorMessage);
                     throw new ValidationException(errorMessage);
                 }
-                if(film.getDuration() == null || film.getDuration().toMinutes() <= 0){
+                if (film.getDuration() == null || film.getDuration().toMinutes() <= 0) {
                     String errorMessage = "Film duration is negative";
                     log.error("Validation is not passed {}", errorMessage);
                     throw new ValidationException(errorMessage);
@@ -110,16 +110,16 @@ public class FilmController {
             String errorMessage = "Film with id " + film.getId() + " not found";
             log.error("Validation is not passed {}", errorMessage);
             throw new NotFoundException(errorMessage);
-        } catch(ValidationException | ConditionsNotMetException | NotFoundException e) {
+        } catch (ValidationException | ConditionsNotMetException | NotFoundException e) {
             log.error("Error updating film: {}, case {}", film, e.getMessage());
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error("Unexpected error to updating film: {}", film, e);
             throw e;
         }
     }
 
-    private long generateFilmId(){
+    private long generateFilmId() {
         long currentId = films.keySet().stream()
                 .mapToLong(id -> id)
                 .max()

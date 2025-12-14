@@ -134,5 +134,4 @@ public class UserController {
                 .orElse(0L);
         return ++currentId;
     }
-
 }
