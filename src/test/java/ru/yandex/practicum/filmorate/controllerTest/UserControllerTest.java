@@ -19,7 +19,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldCreateUserWithValidData(){
+    void shouldCreateUserWithValidData() {
         User user = new User();
         user.setEmail("email@example.com");
         user.setLogin("login");
@@ -35,7 +35,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenEmailIsNull(){
+    void shouldThrowExceptionWhenEmailIsNull() {
         User user = new User();
         user.setEmail(null);
         user.setLogin("login");
@@ -44,7 +44,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenLoginIsNull(){
+    void shouldThrowExceptionWhenLoginIsNull() {
         User user = new User();
         user.setEmail("email@example.com");
         user.setLogin(null);
@@ -52,7 +52,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenLoginHaveSpaces(){
+    void shouldThrowExceptionWhenLoginHaveSpaces() {
         User user = new User();
         user.setLogin("login asdasd");
         user.setEmail("email@example.com");
@@ -70,9 +70,8 @@ public class UserControllerTest {
         assertThrows(ValidationException.class, () -> userController.addUser(user));
     }
 
-
     @Test
-    void shouldThrowExceptionWhenEmailWithoutAt(){
+    void shouldThrowExceptionWhenEmailWithoutAt() {
         User user = new User();
         user.setLogin("login");
         user.setBirthday(LocalDate.of(1980, 1, 1));
@@ -82,13 +81,11 @@ public class UserControllerTest {
 
     @Test
     void shouldUpdateUserSuccessfully() {
-        // given
         User user = new User();
         user.setEmail("test@example.com");
         user.setLogin("testlogin");
         user.setBirthday(LocalDate.of(1990, 1, 1));
         User createdUser = userController.addUser(user);
-
 
         createdUser.setEmail("updated@example.com");
         createdUser.setLogin("updatedlogin");
