@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.controllerTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
 
-    private FilmController filmController;
+    private InMemoryFilmStorage inMemoryFilmStorage;
 
     @BeforeEach
     void setUp() {
-        filmController = new FilmController();
+        inMemoryFilmStorage = new InMemoryFilmStorage(); // Изменено на InMemoryFilmStorage
     }
 
     @Test
@@ -29,7 +29,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(Duration.ofMinutes(120));
 
-        Film createdFilm = filmController.addFilm(film);
+        Film createdFilm = inMemoryFilmStorage.addFilm(film);
 
         assertNotNull(createdFilm.getId());
         assertEquals("Test Film", createdFilm.getName());
@@ -44,7 +44,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(Duration.ofMinutes(120));
 
-        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertThrows(ValidationException.class, () -> inMemoryFilmStorage.addFilm(film));
     }
 
     @Test
@@ -55,7 +55,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(Duration.ofMinutes(120));
 
-        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertThrows(ValidationException.class, () -> inMemoryFilmStorage.addFilm(film));
     }
 
     @Test
@@ -66,7 +66,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(Duration.ofMinutes(120));
 
-        Film createdFilm = filmController.addFilm(film);
+        Film createdFilm = inMemoryFilmStorage.addFilm(film);
 
         assertNotNull(createdFilm);
         assertEquals(200, createdFilm.getDescription().length());
@@ -80,7 +80,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
         film.setDuration(Duration.ofMinutes(120));
 
-        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertThrows(ValidationException.class, () -> inMemoryFilmStorage.addFilm(film));
     }
 
     @Test
@@ -91,7 +91,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 28));
         film.setDuration(Duration.ofMinutes(120));
 
-        Film createdFilm = filmController.addFilm(film);
+        Film createdFilm = inMemoryFilmStorage.addFilm(film);
 
         assertNotNull(createdFilm);
     }
@@ -104,7 +104,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(Duration.ofMinutes(-10));
 
-        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertThrows(ValidationException.class, () -> inMemoryFilmStorage.addFilm(film));
     }
 
     @Test
@@ -116,6 +116,18 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(Duration.ofMinutes(120));
 
-        assertThrows(NotFoundException.class, () -> filmController.updateFilm(film));
+        assertThrows(NotFoundException.class, () -> inMemoryFilmStorage.updateFilm(film));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenIdIsNullForUpdate() {
+        Film film = new Film();
+        film.setId(null);
+        film.setName("Test Film");
+        film.setDescription("Test Description");
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film.setDuration(Duration.ofMinutes(120));
+
+        assertThrows(NotFoundException.class, () -> inMemoryFilmStorage.updateFilm(film));
     }
 }
