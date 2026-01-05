@@ -1,137 +1,71 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final HashMap<Long, User> users = new HashMap<>();
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("Get request, size: {}", users.size());
-        return users.values();
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User addUser(@RequestBody User user) {
-        log.info("Add request, user: {}", user);
-
-        try {
-            log.info("Starting to validation users");
-            if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-                String errorMessage = "Email is mandatory";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-                String errorMessage = "Login is mandatory";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-
-            if (user.getBirthday().isAfter(LocalDate.now())) {
-                String errorMessage = "Birthday is after current date";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            long userId = generateUserId();
-            user.setId(userId);
-            users.put(userId, user);
-
-            return user;
-        } catch (ValidationException e) {
-            log.error("Error adding user: {}, case {}", user, e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error to adding user: {}", user, e);
-            throw e;
-        }
-
+        return userService.addUser(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        log.info("Update request, user: {}", user);
-
-        try {
-            log.info("Starting to validation users");
-            if (user.getId() == null) {
-                String errorMessage = "ID is required for update";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-
-            if (!users.containsKey(user.getId())) {
-                String errorMessage = "User with ID " + user.getId() + " not found";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-
-            if (user.getEmail() == null || user.getEmail().isBlank()) {
-                String errorMessage = "Email is mandatory and cannot be empty";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            if (!user.getEmail().contains("@")) {
-                String errorMessage = "Email must contain @ symbol";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-
-            if (user.getLogin() == null || user.getLogin().isBlank()) {
-                String errorMessage = "Login is mandatory and cannot be empty";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            if (user.getLogin().contains(" ")) {
-                String errorMessage = "Login cannot contain spaces";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-
-            if (user.getBirthday() == null) {
-                String errorMessage = "Birthday is mandatory";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            if (user.getBirthday().isAfter(LocalDate.now())) {
-                String errorMessage = "Birthday cannot be in the future";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-
-            users.put(user.getId(), user);
-            return user;
-        } catch (ValidationException e) {
-            log.error("Error updating user: {}, case {}", user, e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error to updating user: {}", user, e);
-            throw e;
-        }
+        return userService.updateUser(user);
     }
 
-    private long generateUserId() {
-        long currentId = users.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0L);
-        return ++currentId;
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable Long id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }

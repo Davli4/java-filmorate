@@ -1,129 +1,68 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
+    private final FilmService filmService;
 
-    private final Map<Long, Film> films = new HashMap<>();
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @GetMapping
     public Collection<Film> getFilms() {
-        log.info("Get request, size: {}", films.size());
-        return films.values();
+        return filmService.getAllFilms();
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable Long id) {
+        return filmService.getFilmById(id);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Film addFilm(@RequestBody Film film) {
-        log.info("Add request, film: {}", film);
-
-        try {
-            log.info("Starting to validation films");
-            if (film.getName() == null || film.getName().isBlank()) {
-                String errorMessage = "Film name is mandatory";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            if (film.getDescription().length() > 200) {
-                String errorMessage = "Film description is too long";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            LocalDate cinemaDate = LocalDate.of(1895, 12, 28);
-            if (film.getReleaseDate().isBefore(cinemaDate)) {
-                String errorMessage = "Film release date is before cinema date";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            if (film.getDuration() == null || film.getDuration().toMinutes() <= 0) {
-                String errorMessage = "Film duration is negative";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ValidationException(errorMessage);
-            }
-            long newId = generateFilmId();
-            film.setId(newId);
-            films.put(film.getId(), film);
-
-            return film;
-        } catch (ValidationException e) {
-            log.error("Error adding film: {}, case {}", film, e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error to adding film: {}", film, e);
-            throw e;
-        }
+        return filmService.addFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        log.info("Update request, film: {}", film);
-
-        try {
-            log.info("Starting to validation films");
-            if (film.getId() == null) {
-                String errorMessage = "Id should not be null";
-                log.error("Validation is not passed {}", errorMessage);
-                throw new ConditionsNotMetException(errorMessage);
-            }
-
-            if (films.containsKey(film.getId())) {
-                Film oldFilm = films.get(film.getId());
-                if (film.getName() == null || film.getName().isBlank()) {
-                    String errorMessage = "Film name is mandatory";
-                    log.error("Validation is not passed {}", errorMessage);
-                    throw new ValidationException(errorMessage);
-                }
-                if (film.getDescription().length() > 200) {
-                    String errorMessage = "Film description is too long";
-                    log.error("Validation is not passed {}", errorMessage);
-                    throw new ValidationException(errorMessage);
-                }
-                LocalDate cinemaDate = LocalDate.of(1895, 12, 28);
-                if (film.getReleaseDate().isBefore(cinemaDate)) {
-                    String errorMessage = "Film release date is before cinema date";
-                    log.error("Validation is not passed {}", errorMessage);
-                    throw new ValidationException(errorMessage);
-                }
-                if (film.getDuration() == null || film.getDuration().toMinutes() <= 0) {
-                    String errorMessage = "Film duration is negative";
-                    log.error("Validation is not passed {}", errorMessage);
-                    throw new ValidationException(errorMessage);
-                }
-                oldFilm.setName(film.getName());
-                oldFilm.setDescription(film.getDescription());
-                oldFilm.setReleaseDate(film.getReleaseDate());
-                oldFilm.setDuration(film.getDuration());
-                return oldFilm;
-            }
-            String errorMessage = "Film with id " + film.getId() + " not found";
-            log.error("Validation is not passed {}", errorMessage);
-            throw new NotFoundException(errorMessage);
-        } catch (ValidationException | ConditionsNotMetException | NotFoundException e) {
-            log.error("Error updating film: {}, case {}", film, e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error to updating film: {}", film, e);
-            throw e;
-        }
+        return filmService.updateFilm(film);
     }
 
-    private long generateFilmId() {
-        long currentId = films.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0L);
-        return ++currentId;
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms(
+            @RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
+        return filmService.getPopularFilms(count);
     }
 }
