@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
 public enum Rating {
     G("G", "Нет возрастных ограничений"),
     PG("PG", "Детям рекомендуется смотреть фильм с родителями"),
@@ -7,19 +11,8 @@ public enum Rating {
     R("R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого"),
     NC_17("NC-17", "Лицам до 18 лет просмотр запрещён");
 
+    @Getter
     private final String code;
+    @Getter
     private final String description;
-
-    Rating(String code, String description) {
-        this.code = code;
-        this.description = description;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }
