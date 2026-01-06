@@ -4,12 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -76,5 +78,22 @@ public class FilmService {
     public int getLikesCount(Long filmId) {
         Film film = filmStorage.getFilmById(filmId);
         return film.getLikes().size();
+    }
+
+    public void addGenreFromFilm(Long filmId, Genre genre) {
+        Film film = filmStorage.getFilmById(filmId);
+        film.getGenres().add(genre);
+        log.info("Film {} has genre {}", filmId, genre);
+    }
+
+    public void removeGenreFromFilm(Long filmId, Genre genre) {
+        Film film = filmStorage.getFilmById(filmId);
+        film.getGenres().remove(genre);
+        log.info("From film {} was removed genre {}", filmId, genre);
+    }
+
+    public Set<Genre> getFilmGenres(Long filmId) {
+        Film film = filmStorage.getFilmById(filmId);
+        return film.getGenres();
     }
 }

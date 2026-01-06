@@ -65,5 +65,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film.getDuration() == null || film.getDuration().toMinutes() <= 0) {
             throw new ValidationException("Duration must be positive");
         }
+        if (film.getMpa() == null) {
+            throw new ValidationException("MPA rating is required");
+        }
     }
 }
