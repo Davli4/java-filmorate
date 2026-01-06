@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 @AllArgsConstructor
 public enum Rating {
     G("G", "Нет возрастных ограничений"),

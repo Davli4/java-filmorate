@@ -111,11 +111,11 @@ public class UserService {
         log.info("User {} confirmed friend request from {}", userId, friendId);
     }
 
-    public List<User> getPendingFriendRequest(Long userId){
-            User user = getUserById(userId);
-            return user.getFriends().entrySet().stream()
-                    .filter(entry -> entry.getValue().equals(FriendshipStatus.PENDING))
-                    .map(entry -> getUserById(entry.getKey()))
-                    .collect(Collectors.toList());
+    public List<User> getPendingFriendRequest(Long userId) {
+        User user = getUserById(userId);
+        return user.getFriends().entrySet().stream()
+                .filter(entry -> entry.getValue().equals(FriendshipStatus.PENDING))
+                .map(entry -> getUserById(entry.getKey()))
+                .collect(Collectors.toList());
     }
 }
