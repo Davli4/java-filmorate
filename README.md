@@ -74,3 +74,41 @@ void addGenreFromFilm(Long filmId, Genre genre)
 void removeGenreFromFilm(Long filmId, Genre genre)
 Set<Genre> getFilmGenres(Long filmId)
 ```
+### Операции с пользователями
+- `Создание нового пользователя`
+```
+INSERT INTO users (email, login, name, birthday) 
+VALUES ('user@example.com', 'login123', 'Имя Фамилия', '1990-01-01');
+```
+- `Получение пользователя по ID`
+```
+SELECT * FROM users WHERE id = 1;
+```
+- `Получение всех пользователей`
+```
+SELECT * FROM users ORDER BY id;
+```
+- `Обновление данных пользователя`
+```
+UPDATE users 
+SET name = 'Новое Имя', email = 'new@example.com'
+WHERE id = 1;
+```
+### Операции с фильмами
+- `Создание нового фильма`
+```
+INSERT INTO films (name, description, release_date, duration, mpa_rating) 
+VALUES ('Название фильма', 'Описание фильма', '2023-01-01', 120, 'PG-13');
+```
+- `Получение фильма по ID`
+```
+SELECT * FROM films WHERE id = 1;
+```
+- `Получение всех фильмов`
+```
+SELECT * FROM films ORDER BY release_date DESC;
+```
+- `Добавление жанра к фильму`
+```
+INSERT INTO film_genres (film_id, genre_id) VALUES (1, 1);
+```
