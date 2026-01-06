@@ -70,8 +70,7 @@ public class FilmService {
         int limit = (count == null || count <= 0) ? 10 : count;
 
         return filmStorage.getFilms().stream()
-                .sorted(Comparator.comparingInt((Film film) -> film.getLikes().size())
-                        .reversed())
+                .sorted(Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed())
                 .limit(limit)
                 .collect(Collectors.toList());
     }

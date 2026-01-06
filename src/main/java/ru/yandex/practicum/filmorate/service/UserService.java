@@ -49,7 +49,7 @@ public class UserService {
 
         user.addFriend(friendId, FriendshipStatus.PENDING);
 
-        if(friend.getFriends().containsKey(userId)) {
+        if (friend.getFriends().containsKey(userId)) {
             user.addFriend(friendId, FriendshipStatus.CONFIRMED);
             friend.addFriend(userId, FriendshipStatus.CONFIRMED);
             log.info("Friendship between {} and {} is confirmed", userId, friendId);
@@ -102,7 +102,7 @@ public class UserService {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
 
-        if(!user.getFriendIds().contains(friendId)) {
+        if (!user.getFriendIds().contains(friendId)) {
             throw new ValidationException("User is not friend with " + friendId);
         }
 
