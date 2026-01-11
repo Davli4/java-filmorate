@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Getter;
+
 public enum Genre {
     COMEDY("Комедия"),
     DRAMA("Драма"),
@@ -8,13 +10,10 @@ public enum Genre {
     DOCUMENTARY("Документальный"),
     ACTION("Боевик");
 
+    @Getter
     private final String name;
 
     Genre(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 }

@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,15 +22,15 @@ public class User {
         return friends.keySet();
     }
 
-    public void addFriend(Long id, FriendshipStatus status){
+    public void addFriend(Long id, FriendshipStatus status) {
         friends.put(id, status);
     }
 
-    public void removeFriend(Long id){
+    public void removeFriend(Long id) {
         friends.remove(id);
     }
 
-    public FriendshipStatus getFriendshipStatus(Long id){
+    public FriendshipStatus getFriendshipStatus(Long id) {
         return friends.get(id);
     }
 }
