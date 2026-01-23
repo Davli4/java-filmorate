@@ -1,5 +1,3 @@
-
-
 DELETE FROM likes;
 DELETE FROM film_genres;
 DELETE FROM films;
@@ -121,17 +119,6 @@ WHERE NOT EXISTS (
     WHERE f.name = 'Фильм 2' AND g.name = 'Боевик'
 );
 
-INSERT INTO film_genres (film_id, genre_id)
-SELECT
-    (SELECT id FROM films WHERE name = 'Фильм 3' AND release_date = '2022-10-20'),
-    (SELECT id FROM genres WHERE name = 'Документальный')
-WHERE NOT EXISTS (
-    SELECT 1 FROM film_genres fg
-                      JOIN films f ON fg.film_id = f.id
-                      JOIN genres g ON fg.genre_id = g.id
-    WHERE f.name = 'Фильм 3' AND g.name = 'Документальный'
-);
-
 INSERT INTO likes (film_id, user_id)
 SELECT
     (SELECT id FROM films WHERE name = 'Фильм 1' AND release_date = '2020-01-01'),
@@ -154,28 +141,6 @@ WHERE NOT EXISTS (
     WHERE f.name = 'Фильм 1' AND u.email = 'user2@example.com'
 );
 
-INSERT INTO likes (film_id, user_id)
-SELECT
-    (SELECT id FROM films WHERE name = 'Фильм 2' AND release_date = '2021-05-15'),
-    (SELECT id FROM users WHERE email = 'user1@example.com')
-WHERE NOT EXISTS (
-    SELECT 1 FROM likes l
-                      JOIN films f ON l.film_id = f.id
-                      JOIN users u ON l.user_id = u.id
-    WHERE f.name = 'Фильм 2' AND u.email = 'user1@example.com'
-);
-
-INSERT INTO likes (film_id, user_id)
-SELECT
-    (SELECT id FROM films WHERE name = 'Фильм 3' AND release_date = '2022-10-20'),
-    (SELECT id FROM users WHERE email = 'user3@example.com')
-WHERE NOT EXISTS (
-    SELECT 1 FROM likes l
-                      JOIN films f ON l.film_id = f.id
-                      JOIN users u ON l.user_id = u.id
-    WHERE f.name = 'Фильм 3' AND u.email = 'user3@example.com'
-);
-
 INSERT INTO friendships (user_id, friend_id, status)
 SELECT
     (SELECT id FROM users WHERE email = 'user1@example.com'),
@@ -187,32 +152,3 @@ WHERE NOT EXISTS (
                       JOIN users u2 ON f.friend_id = u2.id
     WHERE u1.email = 'user1@example.com' AND u2.email = 'user2@example.com'
 );
-
-INSERT INTO friendships (user_id, friend_id, status)
-SELECT
-    (SELECT id FROM users WHERE email = 'user1@example.com'),
-    (SELECT id FROM users WHERE email = 'user3@example.com'),
-    'PENDING'
-WHERE NOT EXISTS (
-    SELECT 1 FROM friendships f
-                      JOIN users u1 ON f.user_id = u1.id
-                      JOIN users u2 ON f.friend_id = u2.id
-    WHERE u1.email = 'user1@example.com' AND u2.email = 'user3@example.com'
-);
-
-INSERT INTO friendships (user_id, friend_id, status)
-SELECT
-    (SELECT id FROM users WHERE email = 'user2@example.com'),
-    (SELECT id FROM users WHERE email = 'user3@example.com'),
-    'CONFIRMED'
-WHERE NOT EXISTS (
-    SELECT 1 FROM friendships f
-                      JOIN users u1 ON f.user_id = u1.id
-                      JOIN users u2 ON f.friend_id = u2.id
-    WHERE u1.email = 'user2@example.com' AND u2.email = 'user3@example.com'
-);
-
-INSERT INTO users (email, login, name, birthday)
-SELECT 'mihaizer_1942@example.com', 'mihaut', 'Чехасловакия Чтотытворишь', '1948-01-15'
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'mihaizer_1942@example.com');
-
