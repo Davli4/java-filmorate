@@ -108,8 +108,8 @@ public class FilmDbStorage implements FilmStorage {
         validateFilm(film);
 
         String sql = """
-            UPDATE films 
-            SET name = ?, description = ?, release_date = ?, 
+            UPDATE films
+            SET name = ?, description = ?, release_date = ?,
                 duration = ?, mpa_rating_id = ?
             WHERE id = ?
             """;
@@ -172,7 +172,7 @@ public class FilmDbStorage implements FilmStorage {
         if (film == null) return;
 
         String genresSql = """
-        SELECT g.* 
+        SELECT g.*
         FROM genres g
         JOIN film_genres fg ON g.id = fg.genre_id
         WHERE fg.film_id = ?

@@ -108,8 +108,8 @@ public class UserDbStorage implements UserStorage {
         if (user == null) return;
 
         String sql = """
-            SELECT friend_id, status 
-            FROM friendships 
+            SELECT friend_id, status
+            FROM friendships
             WHERE user_id = ?
             """;
 
@@ -171,7 +171,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getCommonFriends(Long userId1, Long userId2) {
         String sql = """
-            SELECT u.* 
+            SELECT u.*
             FROM users u
             JOIN friendships f1 ON u.id = f1.friend_id
             JOIN friendships f2 ON u.id = f2.friend_id
@@ -185,7 +185,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getPendingFriendRequests(Long userId) {
         String sql = """
-            SELECT u.* 
+            SELECT u.*
             FROM users u
             JOIN friendships f ON u.id = f.friend_id
             WHERE f.user_id = ? AND f.status = 'PENDING'
