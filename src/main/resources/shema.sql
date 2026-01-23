@@ -48,6 +48,6 @@ CREATE TABLE IF NOT EXISTS friendships(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, friend_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (friend_id) REFERENCES films(id) ON DELETE CASCADE
+    FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
