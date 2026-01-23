@@ -1,43 +1,16 @@
-INSERT INTO mpa_ratings (name, description)
-SELECT 'G', 'Для всех возрастов'
-    WHERE NOT EXISTS (SELECT 1 FROM mpa_ratings WHERE name = 'G');
+MERGE INTO mpa_ratings (id, name, description) KEY(id)
+    VALUES
+        (1, 'G', 'General Audiences. All ages admitted.'),
+        (2, 'PG', 'Parental Guidance Suggested. Some material may not be suitable for children.'),
+        (3, 'PG-13', 'Parents Strongly Cautioned. Some material may be inappropriate for children under 13.'),
+        (4, 'R', 'Restricted. Children under 17 require accompanying parent or adult guardian.'),
+        (5, 'NC-17', 'Adults Only. No one 17 and under admitted.');
 
-INSERT INTO mpa_ratings (name, description)
-SELECT 'PG', 'Рекомендуется присутствие родителей'
-    WHERE NOT EXISTS (SELECT 1 FROM mpa_ratings WHERE name = 'PG');
-
-INSERT INTO mpa_ratings (name, description)
-SELECT 'PG-13', 'Детям до 13 лет просмотр не желателен'
-    WHERE NOT EXISTS (SELECT 1 FROM mpa_ratings WHERE name = 'PG-13');
-
-INSERT INTO mpa_ratings (name, description)
-SELECT 'R', 'Лицам до 17 лет обязательно присутствие взрослого'
-    WHERE NOT EXISTS (SELECT 1 FROM mpa_ratings WHERE name = 'R');
-
-INSERT INTO mpa_ratings (name, description)
-SELECT 'NC-17', 'Лицам до 18 лет просмотр запрещён'
-    WHERE NOT EXISTS (SELECT 1 FROM mpa_ratings WHERE name = 'NC-17');
-
-INSERT INTO genres (name)
-SELECT 'Комедия'
-    WHERE NOT EXISTS (SELECT 1 FROM genres WHERE name = 'Комедия');
-
-INSERT INTO genres (name)
-SELECT 'Драма'
-    WHERE NOT EXISTS (SELECT 1 FROM genres WHERE name = 'Драма');
-
-INSERT INTO genres (name)
-SELECT 'Мультфильм'
-    WHERE NOT EXISTS (SELECT 1 FROM genres WHERE name = 'Мультфильм');
-
-INSERT INTO genres (name)
-SELECT 'Триллер'
-    WHERE NOT EXISTS (SELECT 1 FROM genres WHERE name = 'Триллер');
-
-INSERT INTO genres (name)
-SELECT 'Документальный'
-    WHERE NOT EXISTS (SELECT 1 FROM genres WHERE name = 'Боевик');
-
-INSERT INTO genres (name)
-SELECT 'Боевик'
-    WHERE NOT EXISTS (SELECT 1 FROM genres WHERE name = 'Фантастика');
+MERGE INTO genres (id, name) KEY(id)
+    VALUES
+        (1, 'Комедия'),
+        (2, 'Драма'),
+        (3, 'Мультфильм'),
+        (4, 'Триллер'),
+        (5, 'Документальный'),
+        (6, 'Боевик');
