@@ -67,7 +67,7 @@ public class UserDbStorage implements UserStorage {
         validateUser(user);
 
         String sql = """
-            UPDATE users 
+            UPDATE users
             SET email = ?, login = ?, name = ?, birthday = ?
             WHERE id = ?
             """;
@@ -158,7 +158,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getFriends(Long userId) {
         String sql = """
-            SELECT u.* 
+            SELECT u.*
             FROM users u
             JOIN friendships f ON u.id = f.friend_id
             WHERE f.user_id = ?
