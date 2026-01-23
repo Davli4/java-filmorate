@@ -176,7 +176,7 @@ public class FilmDbStorage implements FilmStorage {
         FROM genres g
         JOIN film_genres fg ON g.id = fg.genre_id
         WHERE fg.film_id = ?
-        ORDER BY g.id 
+        ORDER BY g.id
         """;
 
         List<Genre> genres = jdbcTemplate.query(genresSql, genreMapper, film.getId());
