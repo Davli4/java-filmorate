@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -17,9 +18,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
-    private final InMemoryUserStorage userStorage;
+    private final UserStorage userStorage;
 
-    public UserService(InMemoryUserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -47,14 +48,25 @@ public class UserService {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
 
-        user.addFriend(friendId, FriendshipStatus.PENDING);
+        if (userStorage instanceof UserDbStorage) {
+            UserDbStorage userDbStorage = (UserDbStorage) userStorage;
 
-        if (friend.getFriends().containsKey(userId)) {
-            user.addFriend(friendId, FriendshipStatus.CONFIRMED);
-            friend.addFriend(userId, FriendshipStatus.CONFIRMED);
-            log.info("Friendship between {} and {} is confirmed", userId, friendId);
+            if (friend.getFriends().containsKey(userId)) {
+                userDbStorage.addFriend(userId, friendId, FriendshipStatus.CONFIRMED);
+                userDbStorage.addFriend(friendId, userId, FriendshipStatus.CONFIRMED);
+                log.info("Friendship between {} and {} is confirmed", userId, friendId);
+            } else {
+                userDbStorage.addFriend(userId, friendId, FriendshipStatus.PENDING);
+                log.info("User {} sent friend request to {}", userId, friendId);
+            }
         } else {
-            log.info("User {} sent friend request to {}", userId, friendId);
+            user.addFriend(friendId, FriendshipStatus.PENDING);
+
+            if (friend.getFriends().containsKey(userId)) {
+                user.addFriend(friendId, FriendshipStatus.CONFIRMED);
+                friend.addFriend(userId, FriendshipStatus.CONFIRMED);
+                log.info("Friendship between {} and {} is confirmed", userId, friendId);
+            }
         }
 
         log.info("User {} added friend {}", userId, friendId);
@@ -64,58 +76,43 @@ public class UserService {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
 
-        if (user.getFriends().remove(friendId) == null) {
-            log.warn("User {} is not friend with {}", userId, friendId);
+        if (userStorage instanceof UserDbStorage) {
+            UserDbStorage userDbStorage = (UserDbStorage) userStorage;
+            userDbStorage.removeFriend(userId, friendId);
+        } else {
+            if (user.getFriends().remove(friendId) == null) {
+                log.warn("User {} is not friend with {}", userId, friendId);
+            }
+            friend.getFriends().remove(userId);
         }
-        friend.getFriends().remove(userId);
 
         log.info("User {} removed friend {}", userId, friendId);
     }
 
     public List<User> getFriends(Long userId) {
-        User user = getUserById(userId);
-        List<User> friends = new ArrayList<>();
-
-        for (Long friendId : user.getFriendIds()) {
-            friends.add(getUserById(friendId));
+        if (userStorage instanceof UserDbStorage) {
+            return ((UserDbStorage) userStorage).getFriends(userId);
+        } else {
+            User user = getUserById(userId);
+            return user.getFriendIds().stream()
+                    .map(this::getUserById)
+                    .collect(Collectors.toList());
         }
-
-        return friends;
     }
 
     public List<User> getCommonFriends(Long userId1, Long userId2) {
-        User user1 = getUserById(userId1);
-        User user2 = getUserById(userId2);
+        if (userStorage instanceof UserDbStorage) {
+            return ((UserDbStorage) userStorage).getCommonFriends(userId1, userId2);
+        } else {
+            User user1 = getUserById(userId1);
+            User user2 = getUserById(userId2);
 
-        Set<Long> commonFriendIds = new HashSet<>(user1.getFriendIds());
-        commonFriendIds.retainAll(user2.getFriendIds());
+            Set<Long> commonFriendIds = new HashSet<>(user1.getFriendIds());
+            commonFriendIds.retainAll(user2.getFriendIds());
 
-        List<User> commonFriends = new ArrayList<>();
-        for (Long friendId : commonFriendIds) {
-            commonFriends.add(getUserById(friendId));
+            return commonFriendIds.stream()
+                    .map(this::getUserById)
+                    .collect(Collectors.toList());
         }
-
-        return commonFriends;
-    }
-
-    public void confirmFriendRequest(Long userId, Long friendId) {
-        User user = getUserById(userId);
-        User friend = getUserById(friendId);
-
-        if (!user.getFriendIds().contains(friendId)) {
-            throw new ValidationException("User is not friend with " + friendId);
-        }
-
-        user.addFriend(friendId, FriendshipStatus.CONFIRMED);
-        friend.addFriend(userId, FriendshipStatus.CONFIRMED);
-        log.info("User {} confirmed friend request from {}", userId, friendId);
-    }
-
-    public List<User> getPendingFriendRequest(Long userId) {
-        User user = getUserById(userId);
-        return user.getFriends().entrySet().stream()
-                .filter(entry -> entry.getValue().equals(FriendshipStatus.PENDING))
-                .map(entry -> getUserById(entry.getKey()))
-                .collect(Collectors.toList());
     }
 }

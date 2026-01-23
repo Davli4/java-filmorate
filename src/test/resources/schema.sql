@@ -1,0 +1,57 @@
+CREATE TABLE IF NOT EXISTS mpa_ratings (
+                                           id INTEGER AUTO_INCREMENT PRIMARY KEY,
+                                           name VARCHAR(10) NOT NULL UNIQUE,
+    description VARCHAR(255)
+    );
+
+CREATE TABLE IF NOT EXISTS genres (
+                                      id INTEGER AUTO_INCREMENT PRIMARY KEY,
+                                      name VARCHAR(50) NOT NULL UNIQUE
+    );
+
+CREATE TABLE IF NOT EXISTS users (
+                                     id INTEGER AUTO_INCREMENT PRIMARY KEY,
+                                     email VARCHAR(255) NOT NULL,
+    login VARCHAR(100) NOT NULL,
+    name VARCHAR(255),
+    birthday DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+CREATE TABLE IF NOT EXISTS films (
+                                     id INTEGER AUTO_INCREMENT PRIMARY KEY,
+                                     name VARCHAR(255) NOT NULL,
+    description TEXT,
+    release_date DATE NOT NULL,
+    duration INTEGER NOT NULL,
+    mpa_rating_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (mpa_rating_id) REFERENCES mpa_ratings(id)
+    );
+
+CREATE TABLE IF NOT EXISTS film_genres (
+                                           film_id INTEGER NOT NULL,
+                                           genre_id INTEGER NOT NULL,
+                                           PRIMARY KEY (film_id, genre_id),
+    FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,
+    FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE
+    );
+
+CREATE TABLE IF NOT EXISTS likes (
+                                     film_id INTEGER NOT NULL,
+                                     user_id INTEGER NOT NULL,
+                                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                     PRIMARY KEY (film_id, user_id),
+    FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+CREATE TABLE IF NOT EXISTS friendships (
+                                           user_id INTEGER NOT NULL,
+                                           friend_id INTEGER NOT NULL,
+                                           status VARCHAR(20) DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
+    );
