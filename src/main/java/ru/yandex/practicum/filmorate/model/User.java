@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+    private LocalDateTime createdAt;
     private Map<Long, FriendshipStatus> friends = new HashMap<>();
 
     public Set<Long> getFriendIds() {
